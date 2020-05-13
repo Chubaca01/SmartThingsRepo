@@ -11,7 +11,9 @@
  *  Unless required by applicable law or agreed to in writing, software distributed under the License is distributed
  *  on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License
  *  for the specific language governing permissions and limitations under the License.
- *
+ *  
+ *  V1.0  First release
+ *  V1.1. Added unit temperature selection
  */
 import groovy.json.JsonSlurper
 import groovy.json.JsonBuilder
@@ -35,6 +37,7 @@ preferences {
     section("How often do you want to send the request") {
         input "valMin", "number", title: "Value in hours or mins",required: true,defaultValue:1,displayDuringSetup: true
         input name: "unitSelected", defaultValue:"hour",required: true, type: "enum", title: "Unit", options: ["min","hour"]
+        input name: "degreeSelected", defaultValue:"fahrenheit",required: true, type: "enum", title: "Degree", options: ["fahrenheit","celcius"]
     }
     section("Enter your Ubibot channel ID & API key") {
     	input "channelId", "text", title: "channel ID", required: true
@@ -72,6 +75,7 @@ def initialize() {
               5: [deviceName:"Voltage",sensorName:"voltage",fieldName:"", currentValue: 0, unit: "V"],
               6: [deviceName:"WIFI RSSI",sensorName:"wifiRSSI", ,fieldName:"", currentValue: 0, unit: "dB"]]
     state.timeCounter = 1
+    updateWithDegreeSelected()
     updateParameters()  
     if (unitSelected == 'min'){
     	runEvery1Minute(handlerMethod)
@@ -80,6 +84,17 @@ def initialize() {
     {
     	runEvery1Hour(handlerMethod)
     }
+}
+
+def updateWithDegreeSelected(){
+	state.sensorList.eachWithIndex { entry, i ->
+    	def mapSensor = entry.value
+        if ( mapSensor.unit == "F"){
+        	if (degreeSelected == "celcius"){
+            	mapSensor.unit = "C"
+            }          
+        }
+   	}
 }
 
 def handlerMethod() {
@@ -95,6 +110,7 @@ def handlerMethod() {
 }
 
 def temperatureHandler(evt) {
+	log.debug "Refresh"
     updateParameters()
 }
 
@@ -112,8 +128,8 @@ def updateParameters() {
 def getDataFromServer() {
     def updateParams = [
         method: 'GET',
-        //uri: "https://api.ubibot.io",
-        uri: "https://0279f372.ngrok.io",
+        uri: "https://api.ubibot.io",
+        //uri: "https://0279f372.ngrok.io",
         path: "/channels",
         query: ["account_key": accountKey],
     ]
@@ -194,3 +210,5 @@ def updateDevice(toSend){
         settings.temp.parse(message)      
 		}
 
+
+    
