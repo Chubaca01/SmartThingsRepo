@@ -18,8 +18,8 @@
  *  
  *  
  *  
- *  05-10-2018 : V1.0 ( updated version from original - johnconstantelo)
- *
+ *  05-10-2020 : V1.0 ( updated version from original - johnconstantelo)
+ *  05-12-2020 : V1.1. Added unit temperature selection 
  */
  
 import groovy.json.JsonSlurper
@@ -128,6 +128,9 @@ def parse(message) {
             def mapSensor = entry.value
             TRACE("mapSensor : $mapSensor ")
             Float fValue = mapSensor.currentValue.toFloat()
+            if (mapSensor.unit == "F"){
+            	fValue = celciusTofahrenheit(fValue)
+            }
             event = [
                 name  : mapSensor.sensorName,
                 value : fValue.round(1),
@@ -151,6 +154,11 @@ private getSensorVal(sensorType, val) {
     Integer value = ts ? ts.integerValue : val
     return value
 }
+
+def celciusTofahrenheit(tempC){
+	def tempF = (tempC * 9)/5 + 32
+    return tempF
+    }
 
 private def TRACE(message) {
     //log.debug message
