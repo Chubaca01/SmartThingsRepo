@@ -14,6 +14,7 @@
  *  
  *  V1.0  First release
  *  V1.1. Added unit temperature selection
+ *  V1.1.1 added Battery level
  */
 import groovy.json.JsonSlurper
 import groovy.json.JsonBuilder
@@ -69,11 +70,12 @@ def initialize() {
     state.jsonMap = ""
     state.sensorInfo =[channelId: ""]
     state.sensorList = [1: [deviceName:"Light",sensorName:"illuminance",fieldName:"", currentValue: 0, unit: "lux" ],
-              2: [deviceName:"Temperature",sensorName:"temperature",fieldName:"", currentValue: 0, unit: "F"],
-              3: [deviceName:"External Temperature Probe",sensorName:"extemperature",fieldName:"", currentValue: 0, unit: "F"],
+              2: [deviceName:"Temperature",sensorName:"extemperature",fieldName:"", currentValue: 0, unit: "F"],
+              3: [deviceName:"External Temperature Probe",sensorName:"temperature",fieldName:"", currentValue: 0, unit: "F"],
               4: [deviceName:"Humidity",sensorName:"humidity",fieldName:"", currentValue: 0, unit: "%"],
               5: [deviceName:"Voltage",sensorName:"voltage",fieldName:"", currentValue: 0, unit: "V"],
-              6: [deviceName:"WIFI RSSI",sensorName:"wifiRSSI", ,fieldName:"", currentValue: 0, unit: "dB"]]
+              6: [deviceName:"WIFI RSSI",sensorName:"wifiRSSI",fieldName:"", currentValue: 0, unit: "dB"],
+              7: [deviceName:"Voltage",sensorName:"battery",fieldName:"", currentValue: 0, unit: "%"]]
     state.timeCounter = 1
     updateWithDegreeSelected()
     updateParameters()  
