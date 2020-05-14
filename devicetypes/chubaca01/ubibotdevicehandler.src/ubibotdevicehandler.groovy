@@ -20,6 +20,7 @@
  *  
  *  05-10-2020 : V1.0 ( updated version from original - johnconstantelo)
  *  05-12-2020 : V1.1. Added unit temperature selection 
+ *. 03-13-2020 : V1.1.1 added Battery level
  */
  
 import groovy.json.JsonSlurper
@@ -30,15 +31,17 @@ metadata {
         capability "Relative Humidity Measurement"
         capability "Sensor"
         capability "Illuminance Measurement"
+        capability "Voltage Measurement"
+        capability "Battery"
         capability "Refresh"
 
         // custom commands
         command "parse"     // (String "temperature:<value>" or "humidity:<value>" )
     }
 	tiles(scale: 1) {
-		multiAttributeTile(name:"extemperature", type: "generic", width: 6, height: 4){
-			tileAttribute ("device.extemperature", key: "PRIMARY_CONTROL") {
-				attributeState("extemperature", label:'🏊🏼${currentValue}°', unit:"F",
+		multiAttributeTile(name:"temperature", type: "generic", width: 6, height: 4){
+			tileAttribute ("device.temperature", key: "PRIMARY_CONTROL") {
+				attributeState("temperature", label:'🏊🏼${currentValue}°', unit:"F",
                 backgroundColors:[
                     [value: 31, color: "#153591"],
                     [value: 44, color: "#1e9cbb"],
@@ -57,11 +60,14 @@ metadata {
         		attributeState("illuminance",label:'\t\t 🔆 ${currentValue} lx', unit:"lx", defaultState: true)
     		}
 		}
-        valueTile("temperature", "device.temperature", decoration: "flat", width: 2, height: 2) {
-			state "temperature", label: '⛅\r${currentValue} °'
+        valueTile("extemperature", "device.extemperature", decoration: "flat", width: 2, height: 2) {
+			state "extemperature", label: '⛅\r${currentValue} °'
 		}
         valueTile("voltage", "device.voltage", decoration: "flat", width: 2, height: 2) {
-			state "voltage", label: '🔋\r${currentValue} V'
+			state "voltage", label: '⚡\r${currentValue} V'
+		}
+        valueTile("battery", "device.battery",decoration: "flat", width: 2, height: 2) {
+			state "battery", label:'🔋\r${currentValue}%'
 		}
         valueTile("wifiRSSI", "device.wifiRSSI", decoration: "flat", width: 2, height: 2) {
 			state "wifiRSSI", label: '📶\r${currentValue} dB'
@@ -72,8 +78,8 @@ metadata {
         standardTile("refresh", "device.switch", width: 2, height: 2, inactiveLabel: false, decoration: "flat") {
             state "default", label: '', action: "refresh.refresh", icon: "st.secondary.refresh"
         }
-        main(["extemperature"])
-        details(["extemperature","temperature","illuminance","voltage","wifiRSSI","chanId","refresh"])
+        main(["temperature"])
+        details(["temperature","illuminance","chanId","extemperature","battery","voltage","wifiRSSI","refresh"])
     }
 }
 
@@ -93,7 +99,8 @@ def initialize() {
               3: [sensorName:"extemperature", initialValue: 30,currentValue: 0, unit: "F"],
               4: [sensorName:"humidity", initialValue: 29,currentValue: 0, unit: "%"],
               5: [sensorName:"voltage", initialValue: 2.78,currentValue: 0, unit: "V"],
-              6: [sensorName:"wifiRSSI", initialValue: -26,currentValue: 0, unit: "dB"]]
+              6: [sensorName:"wifiRSSI", initialValue: -26,currentValue: 0, unit: "dB"],
+              7: [sensorName:"battery", initialValue: 80,currentValue: 0, unit: "%"]]
     TRACE( "initialize")
     state.sensorList.eachWithIndex { entry, i ->
 		TRACE( "$i - Index: $entry.key Value: $entry.value")
@@ -131,6 +138,9 @@ def parse(message) {
             if (mapSensor.unit == "F"){
             	fValue = celciusTofahrenheit(fValue)
             }
+            if (mapSensor.sensorName == "battery"){
+            	fValue = calcBatteryLevel(fValue)
+            }
             event = [
                 name  : mapSensor.sensorName,
                 value : fValue.round(1),
@@ -159,6 +169,17 @@ def celciusTofahrenheit(tempC){
 	def tempF = (tempC * 9)/5 + 32
     return tempF
     }
+    
+def calcBatteryLevel(voltMeas){
+  	Float batLevel = ((voltMeas * 100)-200)/0.9
+   	if (batLevel < 0) {
+   		batLevel = 0
+   	}
+   	if (batLevel > 100) {
+   		batLevel = 100
+   	}
+    return batLevel
+}
 
 private def TRACE(message) {
     //log.debug message
