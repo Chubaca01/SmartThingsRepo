@@ -70,7 +70,7 @@ metadata {
 			state "battery", label:'🔋\r${currentValue}%'
 		}
         valueTile("wifiRSSI", "device.wifiRSSI", decoration: "flat", width: 2, height: 2) {
-			state "wifiRSSI", label: '📶\r${currentValue} dB'
+			state "wifiRSSI", label: 'Wifi 📶\r${currentValue} dB'
 		}
         valueTile("chanId", "device.chanId", decoration: "flat", width: 2, height: 2) {
 			state "chanId", label: '\rChannel Id\r${currentValue}'
@@ -94,13 +94,13 @@ def updated() {
 def initialize() {
 	// init flipValue to true : used to trigger sendEvent on refresh to SsmartApp
 	state.flipValue = true
-    state.sensorList = [1: [sensorName:"illuminance", initialValue: 300, currentValue: 0, unit: "lux"],
-              2: [sensorName:"temperature", initialValue: 25,currentValue: 0, unit: "F"],
-              3: [sensorName:"extemperature", initialValue: 30,currentValue: 0, unit: "F"],
-              4: [sensorName:"humidity", initialValue: 29,currentValue: 0, unit: "%"],
-              5: [sensorName:"voltage", initialValue: 2.78,currentValue: 0, unit: "V"],
-              6: [sensorName:"wifiRSSI", initialValue: -26,currentValue: 0, unit: "dB"],
-              7: [sensorName:"battery", initialValue: 80,currentValue: 0, unit: "%"]]
+    state.sensorList = [1: [sensorName:"illuminance", initialValue: 300],
+              2: [sensorName:"temperature", initialValue: 25],
+              3: [sensorName:"extemperature", initialValue: 30],
+              4: [sensorName:"humidity", initialValue: 29],
+              5: [sensorName:"voltage", initialValue: 2.78],
+              6: [sensorName:"wifiRSSI", initialValue: -26],
+              7: [sensorName:"battery", initialValue: 80]]
     TRACE( "initialize")
     state.sensorList.eachWithIndex { entry, i ->
 		TRACE( "$i - Index: $entry.key Value: $entry.value")
@@ -130,13 +130,18 @@ def parse(message) {
     else
     {
     	TRACE("parseMap : $msg ")
+        def unit
     	msg.eachWithIndex { entry, i ->
         	TRACE( "$i - Index: $entry.key Value: $entry.value")
             def mapSensor = entry.value
             TRACE("mapSensor : $mapSensor ")
+            unit = mapSensor.unit
             Float fValue = mapSensor.currentValue.toFloat()
             if (mapSensor.unit == "F"){
             	fValue = celciusTofahrenheit(fValue)
+                TRACE("****** celcius to far **** : $fValue")
+                // to avoid trick from the server let's stick the unit to F
+                unit = "F"
             }
             if (mapSensor.sensorName == "battery"){
             	fValue = calcBatteryLevel(fValue)
@@ -144,7 +149,7 @@ def parse(message) {
             event = [
                 name  : mapSensor.sensorName,
                 value : fValue.round(1),
-                unit  : mapSensor.unit,
+                unit  : unit,
             ]
     	TRACE("event: (${event})")
     	sendEvent(event)    
@@ -182,6 +187,6 @@ def calcBatteryLevel(voltMeas){
 }
 
 private def TRACE(message) {
-    //log.debug message
+    log.debug message
 }
 
