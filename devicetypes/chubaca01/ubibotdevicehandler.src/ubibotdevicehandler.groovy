@@ -15,14 +15,15 @@
  *  License  for the specific language governing permissions and limitations
  *  under the License.
  *
- *  
- *  
- *  
+ *
+ *
+ *
  *  05-10-2020 : V1.0 ( updated version from original - johnconstantelo)
- *  05-12-2020 : V1.1. Added unit temperature selection 
- *. 03-13-2020 : V1.1.1 added Battery level
+ *  05-12-2020 : V1.1. Added unit temperature selection
+ *  03-13-2020 : V1.1.1 added Battery level
+  * 03-15-2020 : V1.1.2 fix bug degree to Farenheit - issue with server converting back to fahrenheit
  */
- 
+
 import groovy.json.JsonSlurper
 
 metadata {
@@ -139,10 +140,12 @@ def parse(message) {
             Float fValue = mapSensor.currentValue.toFloat()
             if (mapSensor.unit == "F"){
             	fValue = celciusTofahrenheit(fValue)
-                TRACE("****** celcius to far **** : $fValue")
-                // to avoid trick from the server let's stick the unit to F
-                unit = "F"
             }
+            else {
+             	// to avoid trick from the server let's stick the unit to F
+             	unit = "F"
+            }
+
             if (mapSensor.sensorName == "battery"){
             	fValue = calcBatteryLevel(fValue)
             }
@@ -152,7 +155,7 @@ def parse(message) {
                 unit  : unit,
             ]
     	TRACE("event: (${event})")
-    	sendEvent(event)    
+    	sendEvent(event)
 		}
     }
     return null
@@ -174,7 +177,7 @@ def celciusTofahrenheit(tempC){
 	def tempF = (tempC * 9)/5 + 32
     return tempF
     }
-    
+
 def calcBatteryLevel(voltMeas){
   	Float batLevel = ((voltMeas * 100)-200)/0.9
    	if (batLevel < 0) {
@@ -189,4 +192,3 @@ def calcBatteryLevel(voltMeas){
 private def TRACE(message) {
     log.debug message
 }
-
