@@ -92,7 +92,7 @@ def updateWithDegreeSelected(){
 	state.sensorList.eachWithIndex { entry, i ->
     	def mapSensor = entry.value
         if ( mapSensor.unit == "F"){
-        	if (degreeSelected == "celcius"){
+        	if (degreeSelected != "fahrenheit"){
             	mapSensor.unit = "C"
             }          
         }
@@ -131,7 +131,7 @@ def getDataFromServer() {
     def updateParams = [
         method: 'GET',
         uri: "https://api.ubibot.io",
-        //uri: "https://0279f372.ngrok.io",
+        //uri: "https://90395da6.ngrok.io",
         path: "/channels",
         query: ["account_key": accountKey],
     ]
