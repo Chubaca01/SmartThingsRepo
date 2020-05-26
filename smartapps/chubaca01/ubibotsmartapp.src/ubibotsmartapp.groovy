@@ -24,7 +24,7 @@ definition(
     namespace: "Chubaca01",
     author: "Philippe Tourn",
     description: "Get Temperature, Humidity ... from Ubibot device: Tested with WS1 model",
-    category: "",
+    category: "My Apps",
    
     iconUrl: "https://s3.amazonaws.com/smartapp-icons/Convenience/Cat-Convenience.png",
     iconX2Url: "https://s3.amazonaws.com/smartapp-icons/Convenience/Cat-Convenience@2x.png",
