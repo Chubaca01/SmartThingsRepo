@@ -47,10 +47,10 @@ metadata {
                     [value: 12, color: "#cd68f8"],
                     [value: 15, color: "#8268f8"],
                     [value: 18, color: "#689ff8"],
-                    [value: 21, color: "#68d9f8"],
-                    [value: 24, color: "#68f876"],
-                    [value: 27, color: "#dbf868"],
-                    [value: 30, color: "#f8ab68"]
+                    [value: 21, color: "#09a1cb"],
+                    [value: 24, color: "#05a215"],
+                    [value: 27, color: "#f3ae04"],
+                    [value: 30, color: "#f56604"]
                 ]
             )
 			}
