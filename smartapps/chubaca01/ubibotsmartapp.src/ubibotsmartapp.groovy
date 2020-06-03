@@ -38,7 +38,9 @@ preferences {
     section("How often do you want to send the request") {
         input "valMin", "number", title: "Value in hours or mins",required: true,defaultValue:1,displayDuringSetup: true
         input name: "unitSelected", defaultValue:"hour",required: true, type: "enum", title: "Unit", options: ["min","hour"]
-        input name: "degreeSelected", defaultValue:"fahrenheit",required: true, type: "enum", title: "Degree", options: ["fahrenheit","celcius"]
+    }
+    section("Select unit for temperature")  {
+    	input name: "degreeSelected", defaultValue:"fahrenheit",required: true, type: "enum", title: "Degree", options: ["fahrenheit","celcius"]
     }
     section("Enter your Ubibot channel ID & API key") {
     	input "channelId", "text", title: "channel ID", required: true
